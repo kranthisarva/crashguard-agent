@@ -201,4 +201,144 @@ CrashGuard is now **automated, alert-enabled, and production-ready**.
 
 ---
 
-Let me know if you want me to commit this README.md into your repo for you.
+
+
+## 📐 9. How the Crash Risk Index (CRI) Is Calculated
+
+CrashGuard uses a **weighted scoring system** that combines multiple macroeconomic stress indicators into a single number called the **Crash Risk Index (CRI)**.
+
+### **Step 1 — Collect Economic Inputs**
+
+The following indicators are fetched from FRED / Yahoo Finance:
+
+| Indicator                    | Meaning                            | Input Used                |
+| ---------------------------- | ---------------------------------- | ------------------------- |
+| Shiller PE Ratio             | Stock market valuation vs earnings | Latest value              |
+| Buffett Indicator            | Total US Market Cap / GDP          | % value                   |
+| Yield Curve (10Y–2Y)         | Recession predictor                | Basis points (bps)        |
+| VIX                          | Volatility / fear index            | Latest close              |
+| Unemployment Rate YoY Change | Labor market weakening             | % point change            |
+| CPI Inflation YoY            | Inflation pressure                 | %                         |
+| Real GDP (QoQ Annualized)    | Economic growth                    | %                         |
+| Margin Debt (Optional)       | Investor leverage                  | Z-score vs 5-year average |
+
+---
+
+### **Step 2 — Convert Each Input Into a Risk Score (0–100)**
+
+Each variable is mapped into a **risk band** based on historical danger zones you define in `config.yaml`. Example for Shiller PE:
+
+| Shiller PE | Score               |
+| ---------- | ------------------- |
+| < 25       | 10 (low risk)       |
+| 25–30      | 40                  |
+| 30–35      | 70                  |
+| > 35       | 90 (very high risk) |
+
+Each indicator has similar bands under `bands:` in config.yaml.
+
+---
+
+### **Step 3 — Apply Weighting**
+
+Each indicator has a weight (importance) from the `weights:` section.
+
+Example from your config:
+
+```yaml
+weights:
+  shiller: 0.15
+  buffett: 0.15
+  unemp:   0.10
+  cpi:     0.10
+  gdp:     0.10
+  curve:   0.15
+  vix:     0.15
+  margin:  0.10
+```
+
+**Weighted CRI formula:**
+
+[
+\text{CRI (base)} = \sum \big( \text{Indicator Score} \times \text{Weight} \big)
+]
+
+Example:
+If Shiller = 70 → 70 × 0.15 = 10.5 points toward CRI.
+
+---
+
+### **Step 4 — Add “Velocity Boost” (Fast-Rising Risk)**
+
+If CRI jumped significantly in the last 7 days, we add extra points:
+
+From config:
+
+```yaml
+velocity_boost:
+  +12: 5      # If CRI↑ by 12+ points in 7 days → add +5
+  +20: 10     # If CRI↑ by 20+ points → add +10
+```
+
+This detects accelerating danger — like 2008 or 2020 crashes.
+
+---
+
+### **Step 5 — Add “Confluence Boost” (Multiple Red Flags at Once)**
+
+If 3 or more of these are true at the same time:
+
+* Yield curve inverted (< 0 bps)
+* VIX > 30
+* Shiller PE > 35
+* Buffett Indicator > 180% of GDP
+
+Then add:
+
+```yaml
+confluence_boost: 10
+```
+
+---
+
+### **Step 6 — Final CRI Value and Color**
+
+After these steps:
+
+[
+\text{CRI (final)} = \text{Weighted CRI} + \text{Velocity Boost} + \text{Confluence Boost}
+]
+
+Then we assign a color level:
+
+```yaml
+thresholds:
+  yellow: 55
+  orange: 65
+  red: 75
+```
+
+| CRI Range | Level     | Alert Sent? |
+| --------- | --------- | ----------- |
+| < 55      | 🟢 GREEN  | No          |
+| 55–64     | 🟡 YELLOW | ✅ Yes       |
+| 65–74     | 🟠 ORANGE | ✅ Yes       |
+| ≥ 75      | 🔴 RED    | ✅ Yes       |
+
+---
+
+### ✅ Example Output
+
+```json
+"cri": 68.4,
+"state": "ORANGE",
+"details": {
+  "vel_boost": 0,
+  "conf_boost": 10,
+  "triggers": ["curve_inverted","vix_gt_30","buffett_gt_180"]
+}
+```
+
+---
+
+
