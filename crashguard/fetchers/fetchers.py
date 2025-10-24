@@ -22,8 +22,17 @@ def fetch_gdp_qoq_annualized():
     return float(s.iloc[-1])
 
 def fetch_vix():
-    data = yf.download("^VIX", period="5d", interval="1d", progress=False, auto_adjust=True)
-    return float(data["Close"].tail(1).item())
+    # Request a few days to ensure at least one close is available
+    data = yf.download("^VIX", period="10d", interval="1d", progress=False, auto_adjust=True)
+
+    close = data["Close"]
+
+    # If yfinance returns a DataFrame (e.g., multi-index columns), pick the last column
+    if hasattr(close, "columns"):              # DataFrame case
+        close = close.iloc[:, -1]              # convert to Series (last column)
+
+    # Now 'close' is a Series: take the most recent non-null value
+    return float(close.dropna().iloc[-1])
 
 def fetch_shiller_pe():
     return float(os.getenv("SHILLER_PE_OVERRIDE","33.0"))
