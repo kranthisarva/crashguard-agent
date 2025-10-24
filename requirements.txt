@@ -6,3 +6,5 @@ fredapi>=0.5
 yfinance>=0.2.40
 requests>=2.32
 PyYAML>=6.0
+plotly>=5.22
+streamlit>=1.37
