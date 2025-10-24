@@ -24,4 +24,4 @@ confluence_hard_triggers: ["curve_inverted", "vix_gt_30", "shiller_gt_35", "buff
 thresholds: { yellow: 55, orange: 65, red: 75 }
 # --- Stock-specific alerts ---
 stocks:
-  tickers: ["SPY","QQQ","NVDA","AMD"]   # change this list however you like
+  tickers: ["SPY","QQQ","NVDA","AMD","UNH","SMCI","SOFI","RKLB","AU","QTUM","MRVL","NVTS","ORCL","WULF","CDZI","PATH","PLUG","BYND","UVXY","DECK"]   # change this list however you like
