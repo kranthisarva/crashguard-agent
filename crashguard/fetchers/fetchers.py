@@ -22,8 +22,8 @@ def fetch_gdp_qoq_annualized():
     return float(s.iloc[-1])
 
 def fetch_vix():
-    data = yf.download("^VIX", period="5d", interval="1d", progress=False)
-    return float(data["Close"].iloc[-1])
+    data = yf.download("^VIX", period="5d", interval="1d", progress=False, auto_adjust=True)
+    return float(data["Close"].tail(1).item())
 
 def fetch_shiller_pe():
     return float(os.getenv("SHILLER_PE_OVERRIDE","33.0"))
