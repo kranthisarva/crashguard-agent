@@ -22,3 +22,6 @@ velocity_boost: { "+12": 5, "+20": 10 }
 confluence_boost: 10
 confluence_hard_triggers: ["curve_inverted", "vix_gt_30", "shiller_gt_35", "buffett_gt_180"]
 thresholds: { yellow: 55, orange: 65, red: 75 }
+# --- Stock-specific alerts ---
+stocks:
+  tickers: ["SPY","QQQ","NVDA","AMD"]   # change this list however you like
