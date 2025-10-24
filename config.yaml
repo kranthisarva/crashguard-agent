@@ -1,0 +1,22 @@
+weights:
+  shiller: 0.15
+  buffett: 0.15
+  unemp: 0.10
+  cpi: 0.10
+  gdp: 0.10
+  curve: 0.15
+  vix: 0.15
+  margin: 0.10
+bands:
+  shiller: [[0,25,10],[25,30,40],[30,35,70],[35,1e9,90]]
+  buffett: [[0,120,10],[120,150,50],[150,180,75],[180,1e9,90]]
+  unemp_yoy: [[-1,0.3,20],[0.3,0.6,50],[0.6,1.0,75],[1.0,1e9,90]]
+  cpi_yoy: [[0,3.0,25],[3.0,4.0,50],[4.0,1e9,75]]
+  gdp_qoq_annualized: [[2.5,1e9,20],[1.0,2.5,40],[0.0,1.0,60],[-1e9,0.0,85]]
+  curve_bps: [[100,1e9,10],[0,25,50],[-1e9,0,85]]
+  vix: [[0,20,20],[20,30,50],[30,1e9,85]]
+  margin_z: [[-1e9,0.5,30],[0.5,1.0,55],[1.0,1e9,80]]
+velocity_boost: {"+12":5, "+20":10}
+confluence_boost: 10
+confluence_hard_triggers: ["curve_inverted","vix_gt_30","shiller_gt_35","buffett_gt_180"]
+thresholds: {yellow:55, orange:65, red:75}
