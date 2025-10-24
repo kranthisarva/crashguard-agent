@@ -9,10 +9,13 @@ class ScoreResult:
     details: dict
 
 def _band_score(bands, value):
+    v = float(value)
     for lo, hi, score in bands:
-        if lo <= value < hi:
+        lo = float(lo); hi = float(hi)
+        if lo <= v < hi:
             return score
     return bands[-1][2]
+
 
 def _classify(cri, th):
     if cri >= th["red"]: return "RED"
