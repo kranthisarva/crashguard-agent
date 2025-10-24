@@ -18,5 +18,12 @@ def _email(title, body):
     return True
 
 def notify(title, body):
-    if not _pushover(title, body):
-        _email(title, body)
+    try:
+        if not _pushover(title, body):
+            _email(title, body)
+    except Exception as e:
+        # Log and continue so the workflow doesn't fail on notification issues
+        print(f"[WARN] Notification failed: {e}")
+        return False
+    return True
+
